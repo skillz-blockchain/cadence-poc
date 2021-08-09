@@ -1,13 +1,26 @@
 # cadence-poc
 
 ---
+## Architecture
+
+Currently this repo exposes 2 main components:
+- [api](./api) is a mock up of the API proposed [here](https://www.notion.so/skillzblockchain/PRD-Ethereum-2-0-Validator-node-API-2c1023a26dcb4bf99e927c24596e2be6#a9c95e7c71f149c78065ed6d92b45c23).
+  - It uses `cadence-web` for the server/routing and allows us to trigger workflows provided by workers.
+  - At the moment, the work's been mostly around the architecture and properly understanding / adapting cadence's sample: [pageflow](https://github.com/uber-common/cadence-samples/tree/master/cmd/samples/pageflow)
+    - It's very much WIP and requires some more work to function
+- [workers](./workers) are mock ups of the workflow which would be triggered by our API.
+  - [Activities](./workers/activities) are steps of a workflow. They should be as atomical as possible.
+  - [Workflows](./workers/workflows) put activities together and handle errors which could arise. They're meant to be called by the API
+  - At the moment, the work's been mostly the discovery of the components of cadence and how they work together.
+  
+---
 ## Links
 
 - [Website](https://cadenceworkflow.io/)
 - [Doc](https://cadenceworkflow.io/docs/get-started/)
 - [API](https://pkg.go.dev/go.uber.org/cadence)
 - [Samples](https://github.com/uber-common/cadence-samples/blob/master/cmd/samples)
-
+  - [Mix API w/ Workflow](https://github.com/uber-common/cadence-samples/tree/master/cmd/samples/pageflow)
 ---
 ## Use Case (-> do we have a use case for it?)
 
