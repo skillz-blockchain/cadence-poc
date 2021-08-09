@@ -1,6 +1,7 @@
-package workers
+package workflows
 
 import (
+    "cadence-poc/workers/activities"
     "go.uber.org/cadence/workflow"
     "go.uber.org/zap"
     "time"
@@ -35,14 +36,14 @@ func BasicWorkflow(ctx workflow.Context, value string) error {
     }
     ctx = workflow.WithActivityOptions(ctx, ao)
 
-    kf := make(KeyFile)
-    if err := workflow.ExecuteActivity(ctx, ValidateKeyFile, value).Get(ctx, kf); err != nil {
+    kf := make(activities.KeyFile)
+    if err := workflow.ExecuteActivity(ctx, activities.ValidateKeyFile, value).Get(ctx, kf); err != nil {
         return err
     }
 
-    workflow.ExecuteActivity(ctx, DeployWaitingKeys, kf)
-    workflow.ExecuteActivity(ctx, ReviewWaitingDeployments, value)
-    workflow.ExecuteActivity(ctx, CheckWaitingForFunds, value)
+    workflow.ExecuteActivity(ctx, activities.DeployWaitingKeys, kf)
+    workflow.ExecuteActivity(ctx, activities.ReviewWaitingDeployments, value)
+    workflow.ExecuteActivity(ctx, activities.CheckWaitingForFunds, value)
 
     return nil
 }
