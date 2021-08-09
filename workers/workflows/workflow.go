@@ -1,4 +1,4 @@
-package pkg
+package workers
 
 import (
     "go.uber.org/cadence/workflow"
