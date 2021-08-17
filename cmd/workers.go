@@ -5,7 +5,6 @@ import (
     "cadence-poc/cadence/prepare_gitops"
     "cadence-poc/cadence/workers"
     "flag"
-    "fmt"
     "go.uber.org/cadence/worker"
     "go.uber.org/zap"
     "os"
@@ -24,7 +23,6 @@ var (
 func main() {
     // Declare CLI arguments
     var mode string
-    var cron string
     flag.StringVar(&mode, "m", "", "Mode is preparer or gitops.")
     flag.Parse()
 
