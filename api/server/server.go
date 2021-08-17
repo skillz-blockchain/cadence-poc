@@ -11,11 +11,6 @@ type Server struct {
 	WorkflowClient workers.CadenceAdapter
 }
 
-const (
-	Domain     = "BaaS"
-	ClientName = "API"
-)
-
 func NewServer(wfc workers.CadenceAdapter) *Server {
 	s := &Server{Engine: gin.Default()}
 

@@ -77,4 +77,3 @@ func (s *UnitTestSuite) Test_SampleFileProcessingWorkflow() {
 
     s.True(s.env.IsWorkflowCompleted())
     s.NoError(s.env.GetWorkflowError())
-	
