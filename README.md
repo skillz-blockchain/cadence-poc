@@ -2,27 +2,55 @@
 
 ---
 ## Architecture
+Everything runs via docker-compose, using the template given by Uber.
+We expose 3 extra services:
+- The [API](./api), a dummy API used as an exemple to trigger workflows
+- The [Preparer](./cmd/workers.go), a Cadence Worker which runs a workflow invoked by the API.
+  - In theory, this workflow simply checks the data from the API is correct, upload it to vault & set a status in DB for the cronjob
+- The [CronJob](./cmd/workers.go), another Cadence Worker which runs a workflow as a cronjob.
+  - This workflow picks up the keys prepared by the preparer and create a PR on GitHub to deploy the validators
+  - In theory, it is essentially the gitops manager
 
-Currently this repo exposes 2 main components:
-- [api](./api) is a mock up of the API proposed [here](https://www.notion.so/skillzblockchain/PRD-Ethereum-2-0-Validator-node-API-2c1023a26dcb4bf99e927c24596e2be6#a9c95e7c71f149c78065ed6d92b45c23).
-  - It uses `cadence-web` for the server/routing and allows us to trigger workflows provided by workers.
-  - At the moment, the work's been mostly around the architecture and properly understanding / adapting cadence's sample: [pageflow](https://github.com/uber-common/cadence-samples/tree/master/cmd/samples/pageflow)
-    - It's very much WIP and requires some more work to function
-- [workers](./workers) are mock ups of the workflow which would be triggered by our API.
-  - [Activities](./workers/activities) are steps of a workflow. They should be as atomical as possible.
-  - [Workflows](./workers/workflows) put activities together and handle errors which could arise. They're meant to be called by the API
-  - At the moment, the work's been mostly the discovery of the components of cadence and how they work together.
-  
+
+- The [cmd](./cmd) directory
+  - Stores the mains of the 3 services
+- The [cadence](./cadence) directory
+  - Provides a wrapper around Cadence to easily build clients and workers
+  - Exposes our workflows & their activities
+    - Each workflow has its subdirectory with its function and activities
+- The [api](./api) directory
+  - Exposes the dummy API used to call the workflows
+
+---
+## How To Run ?
+
+`docker-compose up --build` should be sufficient
+
+---
+## TODOs
+
+- Make the API mock up call a workflow
+  - [Framework to test workflows]()
+    - Seems fairly simple once you get the notions
+
+
 ---
 ## Links
 
+- [Presentation of Cadence @Uber Open Summit 2018](https://www.youtube.com/watch?v=llmsBGKOuWI)
 - [Website](https://cadenceworkflow.io/)
 - [Doc](https://cadenceworkflow.io/docs/get-started/)
 - [API](https://pkg.go.dev/go.uber.org/cadence)
 - [Samples](https://github.com/uber-common/cadence-samples/blob/master/cmd/samples)
   - [Mix API w/ Workflow](https://github.com/uber-common/cadence-samples/tree/master/cmd/samples/pageflow)
+- [Building your first Cadence Workflow](https://medium.com/stashaway-engineering/building-your-first-cadence-workflow-e61a0b29785)
+- [Testing](https://cadenceworkflow.io/docs/go-client/workflow-testing)
+
 ---
-## Use Case (-> do we have a use case for it?)
+## Use Cases (-> do we have a use case for it?)
+
+In summary, Cadence fills a lot of use case and could help us scale up; however, at the moment
+it is simply too big / complex to be worth it.
 
 - [Periodic execution](https://cadenceworkflow.io/docs/use-cases/periodic-execution/) -> yes
 - [Orchestration](https://cadenceworkflow.io/docs/use-cases/orchestration/) -> yes
@@ -31,7 +59,7 @@ Currently this repo exposes 2 main components:
 - [Storage scan](https://cadenceworkflow.io/docs/use-cases/partitioned-scan/) -> no?
 - [Batch job](https://cadenceworkflow.io/docs/use-cases/batch-job/) -> maybe?
 - [Infrastructure provisioning](https://cadenceworkflow.io/docs/use-cases/provisioning/) -> no?
-- [Deployment](https://cadenceworkflow.io/docs/use-cases/deployment/) -> no (gitops manager)
+- [Deployment](https://cadenceworkflow.io/docs/use-cases/deployment/) -> yes (gitops manager essentially become (a) workflow(s))
 - [Operational management](https://cadenceworkflow.io/docs/use-cases/operational-management/) -> no 
 - [Interactive application](https://cadenceworkflow.io/docs/use-cases/interactive/) -> no
 - [DSL workflows](https://cadenceworkflow.io/docs/use-cases/dsl/) -> no
